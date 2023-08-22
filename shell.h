@@ -21,5 +21,6 @@ char *_strdup(char *str);
 char *build_path(char *dir, char *command);
 char *find_path(char *command, char **env);
 char *_strcat(char *dest, char *src);
+void print_env(char **env);
 
 #endif /* SHELL_H */
