@@ -10,8 +10,8 @@
 int main(int argc, char **argv, char **env)
 {
 	char *line = NULL;
-	/*size_t len = 0;*/
-	/*ssize_t read;*/
+	size_t len = 0;
+	ssize_t read;
 	char **args = NULL;
 	int status;
 
@@ -23,11 +23,14 @@ int main(int argc, char **argv, char **env)
 	while (1)
 	{
 		write(STDOUT_FILENO, "($) ", 4);
-		/* Call your own getline function */
-		line = _getline(STDIN_FILENO);
-
-		if (line == NULL) /* If end of file or error, break the loop */
+		read = getline(&line, &len, stdin);
+		if (read == -1)
+		{
+			if (isatty(STDIN_FILENO))
+				write(STDOUT_FILENO, "\n", 1);
 			break;
+		}
+
 		args = split_line(line);
 		if (args == NULL)
 			continue;

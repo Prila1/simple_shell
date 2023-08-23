@@ -22,7 +22,5 @@ int execute(char **args, char **env);
 int _strcmp(char *s1, char *s2);
 void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size);
 char *_memcpy(char *dest, char *src, unsigned int n);
-char *_getline(int fd);
-int refill_buffer(int fd, char *buffer, int *size, int *index);
 
 #endif /* SHELL_H */

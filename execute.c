@@ -14,8 +14,8 @@ int execute(char **args, char **env)
 	if (args == NULL || args[0] == NULL)
 		return (0);
 
-	if (_strcmp(args[0], "exit") == 0)
-		return (-1);
+	/* if (_strcmp(args[0], "exit") == 0) */
+		/* return (-1); */
 
 	pid = fork();
 	if (pid == -1)
