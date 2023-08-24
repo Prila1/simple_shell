@@ -1,51 +1,44 @@
 #include "shell.h"
 
 /**
- * main - Entry point of the shell program
- * @argc: The number of arguments passed to the program
- * @argv: The array of arguments passed to the program
- * @env: The array of environment variables
+ * main - entry point
+ * @ac: arg count
+ * @av: arg vector
+ *
  * Return: 0 on success, 1 on error
  */
-int main(int argc, char **argv, char **env)
+int main(int ac, char **av)
 {
-	char *line = NULL;
-	size_t len = 0;
-	ssize_t read;
-	char **args = NULL;
-	int status;
+	info_t info[] = { INFO_INIT };
+	int fd = 2;
 
-	(void)argc;
-	(void)argv;
+	asm ("mov %1, %0\n\t"
+		"add $3, %0"
+		: "=r" (fd)
+		: "r" (fd));
 
-	signal(SIGINT, sigint_handler);
-
-	while (1)
+	if (ac == 2)
 	{
-		write(STDOUT_FILENO, "($) ", 4);
-		read = getline(&line, &len, stdin);
-		if (read == -1)
+		fd = open(av[1], O_RDONLY);
+		if (fd == -1)
 		{
-			if (isatty(STDIN_FILENO))
-				write(STDOUT_FILENO, "\n", 1);
-			break;
+			if (errno == EACCES)
+				exit(126);
+			if (errno == ENOENT)
+			{
+				_eputs(av[0]);
+				_eputs(": 0: Can't open ");
+				_eputs(av[1]);
+				_eputchar('\n');
+				_eputchar(BUF_FLUSH);
+				exit(127);
+			}
+			return (EXIT_FAILURE);
 		}
-
-		args = split_line(line);
-		if (args == NULL)
-			continue;
-
-		status = execute(args, env);
-		if (status == -1)
-			break;
-
-		free(line);
-		free(args);
-		line = NULL;
-		args = NULL;
+		info->readfd = fd;
 	}
-	free(line);
-	free(args);
-
-	return (0);
+	populate_env_list(info);
+	read_history(info);
+	hsh(info, av);
+	return (EXIT_SUCCESS);
 }
